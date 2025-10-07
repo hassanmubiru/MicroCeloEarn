@@ -1,0 +1,17 @@
+{
+  "name": "micro-celo-earn-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for MicroCeloEarn platform",
+  "scripts": {
+    "deploy:testnet": "CELO_NETWORK=alfajores node scripts/deploy-contracts.js",
+    "deploy:mainnet": "CELO_NETWORK=mainnet node scripts/deploy-contracts.js"
+  },
+  "dependencies": {
+    "@celo/contractkit": "^5.2.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "ethers": "^6.9.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.19.0"
+  }
+}
