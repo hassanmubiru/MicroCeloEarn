@@ -39,6 +39,8 @@ export const DEFAULT_NETWORK =
 // Contract address (will be set after deployment)
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || ""
 
+export const DEMO_MODE = false
+
 // Validate contract address is set
 export function isContractConfigured(): boolean {
   return CONTRACT_ADDRESS !== "" && CONTRACT_ADDRESS.startsWith("0x") && CONTRACT_ADDRESS.length === 42
