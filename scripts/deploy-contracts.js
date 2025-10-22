@@ -56,7 +56,7 @@ async function main() {
   console.log(`🔗 Explorer: https://${network === 'celo' ? 'celoscan.io' : 'alfajores.celoscan.io'}/address/${contractAddress}`);
 
   // Get deployer address (use environment variable or fallback to runner address)
-  const deployerAddress = process.env.DEPLOYER_ADDRESS || await microCeloEarn.runner?.getAddress();
+  const finalDeployerAddress = process.env.DEPLOYER_ADDRESS || await microCeloEarn.runner?.getAddress();
   
   // Save deployment info
   const deploymentInfo = {
