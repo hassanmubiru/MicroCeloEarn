@@ -15,10 +15,11 @@ module.exports = {
   networks: {
     // Celo Sepolia Testnet
     celo_sepolia: {
-      url: "https://forno.celo-sepolia.celo-testnet.org",
+      url: "https://rpc.ankr.com/celo_sepolia",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11142220,
-      gasPrice: 20000000000, // 20 gwei
+      gasPrice: "auto",
+      gas: 8000000,
       httpHeaders: {},
       timeout: 60000,
     },
