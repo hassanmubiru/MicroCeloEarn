@@ -5,9 +5,5 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
-  ],
-  "env": {
-    "NEXT_PUBLIC_CONTRACT_ADDRESS": "@next_public_contract_address",
-    "NEXT_PUBLIC_NETWORK": "@next_public_network"
-  }
+  ]
 }
