@@ -36,6 +36,8 @@ export const CELO_NETWORKS = {
 export const DEFAULT_NETWORK =
   process.env.NEXT_PUBLIC_CELO_NETWORK === "mainnet" ? CELO_NETWORKS.mainnet : CELO_NETWORKS.alfajores
 
+export const CELO_NETWORK = process.env.NEXT_PUBLIC_CELO_NETWORK || "alfajores"
+
 // Contract address (will be set after deployment)
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || ""
 

@@ -1,95 +1,153 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { TaskCard } from "@/components/task-card"
 import { TaskFilters } from "@/components/task-filters"
 import { CreateTaskDialog } from "@/components/create-task-dialog"
-
-// Mock data - will be replaced with blockchain data
-const mockTasks = [
-  {
-    id: 1,
-    title: "Translate 500 words from English to Spanish",
-    description: "Need accurate translation of marketing content. Must be native Spanish speaker.",
-    category: "Translation",
-    reward: "5.00",
-    currency: "cUSD",
-    deadline: new Date(Date.now() + 86400000 * 2).toISOString(),
-    poster: "0x1234...5678",
-    status: "open",
-    difficulty: "Easy",
-  },
-  {
-    id: 2,
-    title: "Data entry: 100 product listings",
-    description: "Enter product information into spreadsheet. Details and format provided.",
-    category: "Data Entry",
-    reward: "8.50",
-    currency: "cUSD",
-    deadline: new Date(Date.now() + 86400000 * 3).toISOString(),
-    poster: "0xabcd...efgh",
-    status: "open",
-    difficulty: "Easy",
-  },
-  {
-    id: 3,
-    title: "Create 3 social media graphics",
-    description: "Design Instagram posts for product launch. Brand guidelines provided.",
-    category: "Design",
-    reward: "15.00",
-    currency: "CELO",
-    deadline: new Date(Date.now() + 86400000 * 5).toISOString(),
-    poster: "0x9876...4321",
-    status: "open",
-    difficulty: "Medium",
-  },
-  {
-    id: 4,
-    title: "Write 3 blog post titles and descriptions",
-    description: "Create engaging titles and meta descriptions for tech blog posts.",
-    category: "Writing",
-    reward: "6.00",
-    currency: "cUSD",
-    deadline: new Date(Date.now() + 86400000).toISOString(),
-    poster: "0xdef0...1234",
-    status: "open",
-    difficulty: "Easy",
-  },
-  {
-    id: 5,
-    title: "Test mobile app and report bugs",
-    description: "Test new mobile app on Android device. Document any issues found.",
-    category: "Testing",
-    reward: "10.00",
-    currency: "cUSD",
-    deadline: new Date(Date.now() + 86400000 * 4).toISOString(),
-    poster: "0x5555...6666",
-    status: "open",
-    difficulty: "Medium",
-  },
-  {
-    id: 6,
-    title: "Transcribe 15-minute audio interview",
-    description: "Transcribe English audio to text. Clear audio quality.",
-    category: "Transcription",
-    reward: "7.50",
-    currency: "cUSD",
-    deadline: new Date(Date.now() + 86400000 * 2).toISOString(),
-    poster: "0x7777...8888",
-    status: "open",
-    difficulty: "Easy",
-  },
-]
+import { getOpenTasks, getTask, type Task } from "@/lib/contract-interactions"
+import { isContractConfigured } from "@/lib/celo-config"
+import { Loader2, AlertCircle, Rocket } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function TaskMarketplace() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all")
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [needsDeployment, setNeedsDeployment] = useState(false)
 
-  const filteredTasks = mockTasks.filter((task) => {
+  useEffect(() => {
+    async function fetchTasks() {
+      if (!isContractConfigured()) {
+        setLoading(false)
+        setNeedsDeployment(true)
+        return
+      }
+
+      try {
+        setLoading(true)
+        setError(null)
+        setNeedsDeployment(false)
+        const taskIds = await getOpenTasks()
+        const taskDetails = await Promise.all(taskIds.map((id) => getTask(id)))
+        setTasks(taskDetails)
+      } catch (err) {
+        console.error("[v0] Error fetching tasks:", err)
+        const errorMessage = err instanceof Error ? err.message : String(err)
+        if (errorMessage.includes("No contract found") || errorMessage.includes("deploy")) {
+          setNeedsDeployment(true)
+          setError(null)
+        } else {
+          setError("Failed to load tasks from blockchain")
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTasks()
+
+    let interval: NodeJS.Timeout | null = null
+    if (isContractConfigured() && !needsDeployment) {
+      interval = setInterval(fetchTasks, 30000)
+    }
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [needsDeployment])
+
+  const filteredTasks = tasks.filter((task) => {
     const categoryMatch = selectedCategory === "all" || task.category === selectedCategory
-    const difficultyMatch = selectedDifficulty === "all" || task.difficulty === selectedDifficulty
-    return categoryMatch && difficultyMatch
+    return categoryMatch
   })
+
+  const formattedTasks = filteredTasks.map((task) => ({
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    category: task.category,
+    reward: task.reward,
+    currency: task.paymentToken === 0 ? "cUSD" : "CELO",
+    deadline: new Date(task.deadline * 1000).toISOString(),
+    poster: `${task.poster.slice(0, 6)}...${task.poster.slice(-4)}`,
+    status: "open",
+    difficulty: "Medium",
+  }))
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (needsDeployment) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              Available Tasks
+            </h1>
+            <p className="mt-2 text-pretty text-muted-foreground">
+              Browse and complete micro-tasks to earn cUSD or CELO
+            </p>
+          </div>
+        </div>
+
+        <div className="flex min-h-[500px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-8 text-center">
+          <div className="rounded-full bg-primary/10 p-4">
+            <Rocket className="h-12 w-12 text-primary" />
+          </div>
+          <h2 className="mt-6 text-2xl font-bold text-foreground">Smart Contract Setup Required</h2>
+          <p className="mt-3 max-w-md text-pretty text-muted-foreground">
+            To start using MicroCeloEarn with real blockchain data, you need to deploy the smart contract to Celo
+            network first.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Button asChild size="lg" className="gap-2">
+              <Link href="/setup">
+                <Rocket className="h-4 w-4" />
+                Deploy Smart Contract
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <a
+                href="https://github.com/yourusername/microceloearn#deployment"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Documentation
+              </a>
+            </Button>
+          </div>
+          <div className="mt-8 rounded-lg bg-background/50 p-4 text-left">
+            <p className="text-sm font-medium text-foreground">Quick Start:</p>
+            <ol className="mt-2 space-y-1 text-sm text-muted-foreground">
+              <li>1. Get free testnet CELO from the faucet</li>
+              <li>2. Deploy contract using Remix IDE</li>
+              <li>3. Set contract address in environment variables</li>
+              <li>4. Start earning with real blockchain transactions</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-destructive/50 bg-destructive/10 p-8 text-center">
+        <AlertCircle className="h-12 w-12 text-destructive" />
+        <p className="mt-4 text-lg font-medium text-destructive">{error}</p>
+        <p className="mt-2 text-sm text-muted-foreground">Please check your wallet connection and try again</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -111,12 +169,12 @@ export function TaskMarketplace() {
       />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredTasks.map((task) => (
+        {formattedTasks.map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}
       </div>
 
-      {filteredTasks.length === 0 && (
+      {formattedTasks.length === 0 && !loading && (
         <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed border-border p-8 text-center">
           <p className="text-lg font-medium text-muted-foreground">No tasks found</p>
           <p className="mt-2 text-sm text-muted-foreground">Try adjusting your filters or check back later</p>

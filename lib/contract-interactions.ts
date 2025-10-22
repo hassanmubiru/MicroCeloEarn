@@ -19,6 +19,7 @@ const CONTRACT_ABI = [
   "function getWorkerProfile(address worker) external view returns (uint256 tasksCompleted, uint256 totalEarned, uint256 rating, uint256 ratingCount)",
   "function getUserPostedTasks(address user) external view returns (uint256[])",
   "function getUserAssignedTasks(address user) external view returns (uint256[])",
+  "function taskCounter() external view returns (uint256)",
   "event TaskCreated(uint256 indexed taskId, address indexed poster, uint256 reward, uint8 token)",
   "event TaskAssigned(uint256 indexed taskId, address indexed worker)",
   "event TaskCompleted(uint256 indexed taskId, address indexed worker, uint256 reward)",
@@ -251,4 +252,76 @@ export async function getUserAssignedTasks(address: string): Promise<number[]> {
   const contract = await getContract(false)
   const taskIds = await contract.getUserAssignedTasks(address)
   return taskIds.map((id: bigint) => Number(id))
+}
+
+/**
+ * Get all tasks (for admin dashboard)
+ */
+export async function getAllTasks(): Promise<Task[]> {
+  const contract = await getContract(false)
+  const taskCounter = await contract.taskCounter()
+  const tasks: Task[] = []
+
+  for (let i = 1; i <= Number(taskCounter); i++) {
+    try {
+      const task = await getTask(i)
+      tasks.push(task)
+    } catch (error) {
+      console.error(`[v0] Error fetching task ${i}:`, error)
+    }
+  }
+
+  return tasks
+}
+
+/**
+ * Get platform statistics (for admin dashboard)
+ */
+export async function getPlatformStats() {
+  const contract = await getContract(false)
+  const taskCounter = await contract.taskCounter()
+  const allTasks = await getAllTasks()
+
+  const totalTasks = Number(taskCounter)
+  const activeTasks = allTasks.filter((t) => t.status === TaskStatus.Open || t.status === TaskStatus.Assigned).length
+  const completedTasks = allTasks.filter((t) => t.status === TaskStatus.Completed).length
+  const disputedTasks = allTasks.filter((t) => t.status === TaskStatus.Disputed).length
+
+  // Calculate total volume
+  const totalVolume = allTasks.reduce((sum, task) => {
+    return sum + Number.parseFloat(task.reward)
+  }, 0)
+
+  return {
+    totalTasks,
+    activeTasks,
+    completedTasks,
+    disputedTasks,
+    totalVolume: totalVolume.toFixed(2),
+  }
+}
+
+/**
+ * Get all unique users (workers and posters)
+ */
+export async function getAllUsers(): Promise<string[]> {
+  const allTasks = await getAllTasks()
+  const usersSet = new Set<string>()
+
+  allTasks.forEach((task) => {
+    usersSet.add(task.poster)
+    if (task.worker && task.worker !== ethers.ZeroAddress) {
+      usersSet.add(task.worker)
+    }
+  })
+
+  return Array.from(usersSet)
+}
+
+/**
+ * Get disputed tasks (for admin dashboard)
+ */
+export async function getDisputedTasks(): Promise<Task[]> {
+  const allTasks = await getAllTasks()
+  return allTasks.filter((task) => task.status === TaskStatus.Disputed)
 }
