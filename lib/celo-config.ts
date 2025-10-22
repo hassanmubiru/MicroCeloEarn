@@ -30,13 +30,28 @@ export const CELO_NETWORKS = {
       CELO: "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9",
     },
   },
+  celo_sepolia: {
+    chainId: 11142220,
+    name: "Celo Sepolia Testnet",
+    rpcUrl: "https://rpc.ankr.com/celo_sepolia",
+    explorerUrl: "https://sepolia.celoscan.io",
+    nativeCurrency: {
+      name: "CELO",
+      symbol: "CELO",
+      decimals: 18,
+    },
+    tokens: {
+      cUSD: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1",
+      CELO: "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9",
+    },
+  },
 }
 
-// Default to testnet for development
-export const DEFAULT_NETWORK =
-  process.env.NEXT_PUBLIC_CELO_NETWORK === "mainnet" ? CELO_NETWORKS.mainnet : CELO_NETWORKS.alfajores
+// Get network from environment or default to celo_sepolia
+export const CELO_NETWORK = process.env.NEXT_PUBLIC_NETWORK || "celo_sepolia"
 
-export const CELO_NETWORK = process.env.NEXT_PUBLIC_CELO_NETWORK || "alfajores"
+// Default network configuration
+export const DEFAULT_NETWORK = CELO_NETWORKS[CELO_NETWORK as keyof typeof CELO_NETWORKS] || CELO_NETWORKS.celo_sepolia
 
 // Contract address (will be set after deployment)
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || ""
