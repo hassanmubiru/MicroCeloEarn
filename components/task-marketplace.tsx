@@ -15,32 +15,25 @@ export function TaskMarketplace() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [needsDeployment, setNeedsDeployment] = useState(false)
 
   useEffect(() => {
     async function fetchTasks() {
       if (!isContractConfigured()) {
         setLoading(false)
-        setNeedsDeployment(true)
+        setError("Contract not configured. Please check your environment variables.")
         return
       }
 
       try {
         setLoading(true)
         setError(null)
-        setNeedsDeployment(false)
         const taskIds = await getOpenTasks()
         const taskDetails = await Promise.all(taskIds.map((id) => getTask(id)))
         setTasks(taskDetails)
       } catch (err) {
         console.error("[v0] Error fetching tasks:", err)
         const errorMessage = err instanceof Error ? err.message : String(err)
-        if (errorMessage.includes("No contract found") || errorMessage.includes("deploy")) {
-          setNeedsDeployment(true)
-          setError(null)
-        } else {
-          setError("Failed to load tasks from blockchain")
-        }
+        setError(`Failed to load tasks: ${errorMessage}`)
       } finally {
         setLoading(false)
       }
@@ -49,14 +42,14 @@ export function TaskMarketplace() {
     fetchTasks()
 
     let interval: NodeJS.Timeout | null = null
-    if (isContractConfigured() && !needsDeployment) {
+    if (isContractConfigured()) {
       interval = setInterval(fetchTasks, 30000)
     }
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [needsDeployment])
+  }, [])
 
   const filteredTasks = tasks.filter((task) => {
     const categoryMatch = selectedCategory === "all" || task.category === selectedCategory
@@ -84,57 +77,7 @@ export function TaskMarketplace() {
     )
   }
 
-  if (needsDeployment) {
-    return (
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Available Tasks
-            </h1>
-            <p className="mt-2 text-pretty text-muted-foreground">
-              Browse and complete micro-tasks to earn cUSD or CELO
-            </p>
-          </div>
-        </div>
-
-        <div className="flex min-h-[500px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-primary/30 bg-primary/5 p-8 text-center">
-          <div className="rounded-full bg-primary/10 p-4">
-            <Rocket className="h-12 w-12 text-primary" />
-          </div>
-          <h2 className="mt-6 text-2xl font-bold text-foreground">Smart Contract Setup Required</h2>
-          <p className="mt-3 max-w-md text-pretty text-muted-foreground">
-            To start using MicroCeloEarn with real blockchain data, you need to deploy the smart contract to Celo
-            network first.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Button size="lg" className="gap-2" disabled>
-              <Rocket className="h-4 w-4" />
-              Smart Contract Already Deployed
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <a
-                href="https://github.com/yourusername/microceloearn#deployment"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Documentation
-              </a>
-            </Button>
-          </div>
-          <div className="mt-8 rounded-lg bg-background/50 p-4 text-left">
-            <p className="text-sm font-medium text-foreground">Quick Start:</p>
-            <ol className="mt-2 space-y-1 text-sm text-muted-foreground">
-              <li>1. Get free testnet CELO from the faucet</li>
-              <li>2. Deploy contract using Remix IDE</li>
-              <li>3. Set contract address in environment variables</li>
-              <li>4. Start earning with real blockchain transactions</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Contract is deployed, show normal marketplace
 
   if (error) {
     return (
