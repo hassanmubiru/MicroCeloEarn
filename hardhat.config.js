@@ -20,6 +20,7 @@ module.exports = {
       chainId: 111447111,
       gasPrice: 20000000000, // 20 gwei
       httpHeaders: {},
+      timeout: 60000,
     },
     // Celo Alfajores Testnet (alternative)
     alfajores: {
@@ -44,6 +45,24 @@ module.exports = {
       alfajores: "your-celoscan-api-key",
       celo: "your-celoscan-api-key",
     },
+    customChains: [
+      {
+        network: "alfajores",
+        chainId: 44787,
+        urls: {
+          apiURL: "https://api-alfajores.celoscan.io/api",
+          browserURL: "https://alfajores.celoscan.io"
+        }
+      },
+      {
+        network: "celo",
+        chainId: 42220,
+        urls: {
+          apiURL: "https://api.celoscan.io/api",
+          browserURL: "https://celoscan.io"
+        }
+      }
+    ]
   },
   sourcify: {
     enabled: true,
