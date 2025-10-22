@@ -64,7 +64,7 @@ async function main() {
     contractAddress,
     cUSD: tokenAddresses.cUSD,
     CELO: tokenAddresses.CELO,
-    deployer: deployerAddress,
+    deployer: finalDeployerAddress,
     timestamp: new Date().toISOString(),
   };
 
