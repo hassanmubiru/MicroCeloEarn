@@ -7,10 +7,19 @@ This guide will help you deploy the MicroCeloEarn smart contract to the Celo blo
 - A wallet with CELO tokens for gas fees
 - For testnet: Get free tokens from [Celo Faucet](https://faucet.celo.org/alfajores)
 - For mainnet: Purchase CELO from an exchange
+- Node.js and npm installed
 
 ## Network Configuration
 
-### Alfajores Testnet (Recommended for Testing)
+### Celo Sepolia Testnet (Recommended for Testing)
+- **RPC URL**: `https://sepolia-forno.celo-testnet.org`
+- **Chain ID**: `111447111`
+- **Explorer**: https://sepolia.celoscan.io
+- **cUSD Address**: `0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1`
+- **CELO Address**: `0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9`
+- **Faucet**: https://faucet.celo.org/alfajores
+
+### Alfajores Testnet (Alternative Testnet)
 - **RPC URL**: `https://alfajores-forno.celo-testnet.org`
 - **Chain ID**: `44787`
 - **Explorer**: https://alfajores.celoscan.io
@@ -27,7 +36,50 @@ This guide will help you deploy the MicroCeloEarn smart contract to the Celo blo
 
 ## Deployment Methods
 
-### Method 1: Remix IDE (Easiest)
+### Method 1: Hardhat (Recommended)
+
+1. **Install Dependencies**
+```bash
+npm install
+```
+
+2. **Set Up Environment Variables**
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env with your values
+nano .env
+```
+
+Fill in your `.env` file:
+```env
+PRIVATE_KEY=your_wallet_private_key_here
+NETWORK=celo_sepolia
+NEXT_PUBLIC_CONTRACT_ADDRESS=
+```
+
+3. **Get Testnet Funds**
+   - Visit https://faucet.celo.org/alfajores
+   - Enter your wallet address
+   - Request CELO tokens
+
+4. **Compile Contracts**
+```bash
+npx hardhat compile
+```
+
+5. **Deploy to Celo Sepolia**
+```bash
+npx hardhat run scripts/deploy-contracts.js --network celo_sepolia
+```
+
+6. **Verify Contract (Optional)**
+```bash
+npx hardhat verify --network celo_sepolia DEPLOYED_CONTRACT_ADDRESS "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1" "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9"
+```
+
+### Method 2: Remix IDE (Alternative)
 
 1. **Get Testnet Funds**
    - Visit https://faucet.celo.org/alfajores
@@ -48,7 +100,7 @@ This guide will help you deploy the MicroCeloEarn smart contract to the Celo blo
    - Go to "Deploy & Run Transactions" tab
    - Select "Injected Provider - MetaMask"
    - Connect your wallet
-   - Ensure you're on Celo Alfajores (Chain ID: 44787)
+   - Ensure you're on Celo Sepolia (Chain ID: 111447111)
 
 5. **Deploy Contract**
    - Select `MicroCeloEarn` contract
@@ -68,99 +120,26 @@ This guide will help you deploy the MicroCeloEarn smart contract to the Celo blo
    - Add: `NEXT_PUBLIC_CONTRACT_ADDRESS` = `your_deployed_contract_address`
    - Save and refresh the app
 
-### Method 2: Hardhat (Advanced)
+## Quick Start Commands
 
-1. **Install Dependencies**
-\`\`\`bash
-npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
-npm install @openzeppelin/contracts @celo/contractkit ethers
-\`\`\`
+For Celo Sepolia deployment:
 
-2. **Initialize Hardhat**
-\`\`\`bash
-npx hardhat init
-\`\`\`
+```bash
+# 1. Install dependencies
+npm install
 
-3. **Configure Hardhat**
+# 2. Set up environment (copy .env.example to .env and fill in your values)
+cp .env.example .env
 
-Create `hardhat.config.js`:
-\`\`\`javascript
-require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
+# 3. Compile contracts
+npx hardhat compile
 
-module.exports = {
-  solidity: "0.8.20",
-  networks: {
-    alfajores: {
-      url: "https://alfajores-forno.celo-testnet.org",
-      accounts: [process.env.PRIVATE_KEY],
-      chainId: 44787,
-    },
-    celo: {
-      url: "https://forno.celo.org",
-      accounts: [process.env.PRIVATE_KEY],
-      chainId: 42220,
-    },
-  },
-};
-\`\`\`
+# 4. Deploy to Celo Sepolia
+npx hardhat run scripts/deploy-contracts.js --network celo_sepolia
 
-4. **Create Deployment Script**
-
-Create `scripts/deploy.js`:
-\`\`\`javascript
-const hre = require("hardhat");
-
-async function main() {
-  const network = hre.network.name;
-  console.log(`Deploying to ${network}...`);
-
-  // Token addresses
-  const addresses = {
-    alfajores: {
-      cUSD: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1",
-      CELO: "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9",
-    },
-    celo: {
-      cUSD: "0x765DE816845861e75A25fCA122bb6898B8B1282a",
-      CELO: "0x471EcE3750Da237f93B8E339c536989b8978a438",
-    },
-  };
-
-  const { cUSD, CELO } = addresses[network] || addresses.alfajores;
-
-  // Deploy contract
-  const MicroCeloEarn = await hre.ethers.getContractFactory("MicroCeloEarn");
-  const contract = await MicroCeloEarn.deploy(cUSD, CELO);
-  await contract.waitForDeployment();
-
-  const address = await contract.getAddress();
-  console.log(`MicroCeloEarn deployed to: ${address}`);
-  console.log(`\nAdd this to your environment variables:`);
-  console.log(`NEXT_PUBLIC_CONTRACT_ADDRESS=${address}`);
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
-\`\`\`
-
-5. **Deploy**
-\`\`\`bash
-# Testnet
-npx hardhat run scripts/deploy.js --network alfajores
-
-# Mainnet
-npx hardhat run scripts/deploy.js --network celo
-\`\`\`
-
-6. **Verify Contract (Optional)**
-\`\`\`bash
-npx hardhat verify --network alfajores DEPLOYED_CONTRACT_ADDRESS "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1" "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9"
-\`\`\`
+# 5. Verify contract (optional)
+npx hardhat verify --network celo_sepolia DEPLOYED_CONTRACT_ADDRESS "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1" "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9"
+```
 
 ## Post-Deployment
 
