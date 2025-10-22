@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -60,7 +60,7 @@ contract MicroCeloEarn is ReentrancyGuard, Ownable {
     event WorkerRated(address indexed worker, uint256 rating);
     event FundsWithdrawn(address indexed user, uint256 amount, PaymentToken token);
     
-    constructor(address _cUSD, address _cELO) {
+    constructor(address _cUSD, address _cELO) Ownable(msg.sender) {
         cUSD = _cUSD;
         CELO = _cELO;
     }
