@@ -33,7 +33,17 @@ export function TaskMarketplace() {
       } catch (err) {
         console.error("[v0] Error fetching tasks:", err)
         const errorMessage = err instanceof Error ? err.message : String(err)
-        setError(`Failed to load tasks: ${errorMessage}`)
+        
+        // Handle specific error cases
+        if (errorMessage.includes("No contract found")) {
+          setError("Contract not found. Please check your network connection and try again.")
+        } else if (errorMessage.includes("No wallet detected")) {
+          setError("Please connect your wallet to continue.")
+        } else if (errorMessage.includes("Contract not configured")) {
+          setError("Contract configuration error. Please refresh the page.")
+        } else {
+          setError(`Failed to load tasks: ${errorMessage}`)
+        }
       } finally {
         setLoading(false)
       }

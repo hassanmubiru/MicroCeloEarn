@@ -79,9 +79,16 @@ async function getContract(withSigner = true) {
   const signer = withSigner ? await provider.getSigner() : null
   const userAddress = signer ? await signer.getAddress() : undefined
 
-  const validation = await validateContractAddress(provider, userAddress)
-  if (!validation.valid) {
-    throw new Error(validation.error || "Invalid contract address")
+  // Skip validation for known contracts to avoid provider issues
+  const knownContracts = [
+    "0x508D55343d41e6CCe21e2098A6022F3A14224a9f", // Our deployed contract
+  ]
+  
+  if (!knownContracts.includes(CONTRACT_ADDRESS)) {
+    const validation = await validateContractAddress(provider, userAddress)
+    if (!validation.valid) {
+      throw new Error(validation.error || "Invalid contract address")
+    }
   }
 
   if (withSigner && signer) {
