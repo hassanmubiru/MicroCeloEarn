@@ -20,6 +20,12 @@ async function main() {
   const network = hre.network.name;
   console.log(`🚀 Deploying MicroCeloEarn to ${network}...`);
 
+  // Check deployer configuration
+  const deployerAddress = process.env.DEPLOYER_ADDRESS;
+  if (deployerAddress) {
+    console.log(`👤 Deployer Address: ${deployerAddress}`);
+  }
+
   // Get token addresses for the current network
   const tokenAddresses = TOKEN_ADDRESSES[network];
   if (!tokenAddresses) {
@@ -49,13 +55,16 @@ async function main() {
   console.log(`🌐 Network: ${network}`);
   console.log(`🔗 Explorer: https://${network === 'celo' ? 'celoscan.io' : 'alfajores.celoscan.io'}/address/${contractAddress}`);
 
+  // Get deployer address (use environment variable or fallback to runner address)
+  const deployerAddress = process.env.DEPLOYER_ADDRESS || await microCeloEarn.runner?.getAddress();
+  
   // Save deployment info
   const deploymentInfo = {
     network,
     contractAddress,
     cUSD: tokenAddresses.cUSD,
     CELO: tokenAddresses.CELO,
-    deployer: await microCeloEarn.runner?.getAddress(),
+    deployer: deployerAddress,
     timestamp: new Date().toISOString(),
   };
 
