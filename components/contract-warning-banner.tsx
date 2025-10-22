@@ -5,7 +5,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { isContractConfigured, getContractAddressError, CONTRACT_ADDRESS } from "@/lib/celo-config"
 import { useWallet } from "@/lib/wallet-context"
-import Link from "next/link"
 
 export function ContractWarningBanner() {
   const { address } = useWallet()
@@ -21,11 +20,9 @@ export function ContractWarningBanner() {
               The contract address is set to your wallet address ({address.slice(0, 6)}...{address.slice(-4)}). This is
               incorrect - you need to deploy the MicroCeloEarn smart contract and use the deployed contract address.
             </p>
-            <Link href="/setup">
-              <Button variant="outline" size="sm">
-                Go to Setup Guide
-              </Button>
-            </Link>
+            <Button variant="outline" size="sm" disabled>
+              Contract Already Deployed
+            </Button>
           </AlertDescription>
         </Alert>
       )
@@ -41,11 +38,9 @@ export function ContractWarningBanner() {
       <AlertTitle>Contract Not Configured</AlertTitle>
       <AlertDescription className="mt-2 flex flex-col gap-3">
         <p>{error}</p>
-        <Link href="/setup">
-          <Button variant="outline" size="sm">
-            Go to Setup Guide
-          </Button>
-        </Link>
+        <Button variant="outline" size="sm" disabled>
+          Contract Already Deployed
+        </Button>
       </AlertDescription>
     </Alert>
   )

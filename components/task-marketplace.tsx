@@ -8,7 +8,6 @@ import { getOpenTasks, getTask, type Task } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
 import { Loader2, AlertCircle, Rocket } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 
 export function TaskMarketplace() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
@@ -109,11 +108,9 @@ export function TaskMarketplace() {
             network first.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/setup">
-                <Rocket className="h-4 w-4" />
-                Deploy Smart Contract
-              </Link>
+            <Button size="lg" className="gap-2" disabled>
+              <Rocket className="h-4 w-4" />
+              Smart Contract Already Deployed
             </Button>
             <Button asChild variant="outline" size="lg">
               <a
