@@ -15,9 +15,9 @@ module.exports = {
   networks: {
     // Celo Sepolia Testnet
     celo_sepolia: {
-      url: "https://sepolia-forno.celo-testnet.org",
+      url: "https://forno.celo-sepolia.celo-testnet.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 111447111,
+      chainId: 11142220,
       gasPrice: 20000000000, // 20 gwei
       httpHeaders: {},
       timeout: 60000,
