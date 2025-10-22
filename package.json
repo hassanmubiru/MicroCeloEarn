@@ -8,7 +8,9 @@
     "lint": "next lint",
     "start": "next start",
     "deploy": "vercel --prod",
-    "deploy:preview": "vercel"
+    "deploy:preview": "vercel",
+    "auto-deploy": "./scripts/auto-deploy.sh",
+    "deploy:auto": "git add . && git commit -m 'Auto-deploy: $(date)' && git push && vercel --prod"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
