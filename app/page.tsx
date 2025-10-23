@@ -8,8 +8,12 @@ import { OnboardingDialog } from "@/components/onboarding-dialog"
 
 export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Mark as client-side rendered
+    setIsClient(true)
+    
     // Check if user has completed onboarding
     const hasCompletedOnboarding = localStorage.getItem("microceloearn_onboarding_completed")
 
@@ -31,7 +35,9 @@ export default function Home() {
         <TaskMarketplace />
       </main>
 
-      <OnboardingDialog open={showOnboarding} onOpenChange={setShowOnboarding} onComplete={handleOnboardingComplete} />
+      {isClient && (
+        <OnboardingDialog open={showOnboarding} onOpenChange={setShowOnboarding} onComplete={handleOnboardingComplete} />
+      )}
     </div>
   )
 }

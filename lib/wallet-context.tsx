@@ -26,13 +26,21 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [balance, setBalance] = useState({ cUSD: "0.00", CELO: "0.00" })
   const [isConnecting, setIsConnecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
 
   const isConnected = !!address
 
-  // Check if wallet is already connected on mount
+  // Mark as client-side rendered
   useEffect(() => {
-    checkConnection()
+    setIsClient(true)
   }, [])
+
+  // Check if wallet is already connected on mount (client-side only)
+  useEffect(() => {
+    if (isClient) {
+      checkConnection()
+    }
+  }, [isClient])
 
   // Listen for account changes
   useEffect(() => {
@@ -46,12 +54,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Fetch balances when address changes
+  // Fetch balances when address changes (client-side only)
   useEffect(() => {
-    if (address) {
+    if (isClient && address) {
       fetchBalances()
     }
-  }, [address])
+  }, [isClient, address])
 
   async function checkConnection() {
     if (typeof window === "undefined" || !window.ethereum) return
