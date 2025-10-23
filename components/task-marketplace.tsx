@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { TaskCard } from "@/components/task-card"
 import { TaskFilters } from "@/components/task-filters"
-import { CreateTaskDialog } from "@/components/create-task-dialog"
 import { getOpenTasks, getTask, getUserAssignedTasks, type Task } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
 import { useWallet } from "@/lib/wallet-context"
@@ -168,7 +167,6 @@ export function TaskMarketplace() {
           </h1>
           <p className="mt-2 text-pretty text-muted-foreground">Browse and complete micro-tasks to earn cUSD or CELO</p>
         </div>
-        <CreateTaskDialog />
       </div>
 
       <TaskFilters
