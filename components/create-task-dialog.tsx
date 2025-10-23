@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useWallet } from "@/lib/wallet-context"
 import { createTask, type PaymentToken } from "@/lib/contract-interactions"
-import { isContractConfigured } from "@/lib/celo-config"
+import { isContractConfigured, DEFAULT_NETWORK } from "@/lib/celo-config"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
 
 export function CreateTaskDialog() {
@@ -30,12 +30,15 @@ export function CreateTaskDialog() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
+  // Check if cUSD is available on current network
+  const isCUSDAvailable = DEFAULT_NETWORK.tokens.cUSD !== "0x0000000000000000000000000000000000000000"
+  
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     reward: "",
-    paymentToken: "0",
+    paymentToken: isCUSDAvailable ? "0" : "1", // Default to CELO if cUSD not available
     deadlineHours: "24",
   })
 
