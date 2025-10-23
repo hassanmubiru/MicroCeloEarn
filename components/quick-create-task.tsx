@@ -222,7 +222,7 @@ export function QuickCreateTask() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting || !isConnected}>
+          <Button type="submit" className="w-full hidden" disabled={isSubmitting || !isConnected}>
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
