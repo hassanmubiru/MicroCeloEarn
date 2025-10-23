@@ -9,6 +9,7 @@ import { DisputesPanel } from "@/components/admin/disputes-panel"
 import { UsersTable } from "@/components/admin/users-table"
 import { TransactionsChart } from "@/components/admin/transactions-chart"
 import { AdminSettings } from "@/components/admin/admin-settings"
+import { AdminCreateTask } from "@/components/admin/admin-create-task"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function AdminDashboard() {
