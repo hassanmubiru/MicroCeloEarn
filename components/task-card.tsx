@@ -16,6 +16,7 @@ interface DisplayTask extends Task {
   difficulty: string
   deadline: string
   status: string
+  workerDisplay?: string
 }
 
 interface TaskCardProps {
@@ -187,6 +188,17 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
     const isTaskPoster = address?.toLowerCase() === task.poster.toLowerCase()
     const isTaskWorker = address?.toLowerCase() === task.worker?.toLowerCase()
 
+    // Debug logging
+    console.log("[v0] TaskCard Debug:", {
+      taskId: task.id,
+      status: task.status,
+      poster: task.poster,
+      worker: task.worker,
+      currentUser: address,
+      isTaskPoster,
+      isTaskWorker
+    })
+
     // Task is open - anyone can accept
     if (task.status === "open") {
       return (
@@ -226,7 +238,7 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
           <div className="w-full text-center">
             <Badge variant="secondary" className="gap-1">
               <User className="h-3 w-3" />
-              Assigned to Worker
+              Assigned to {task.workerDisplay || "Worker"}
             </Badge>
           </div>
         )
@@ -339,6 +351,13 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
             <span className="font-mono text-xs">{task.poster}</span>
           </div>
         </div>
+        
+        {task.worker && (
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <User className="h-4 w-4" />
+            <span>Worker: {task.workerDisplay || task.worker}</span>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter>

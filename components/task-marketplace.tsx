@@ -91,6 +91,9 @@ export function TaskMarketplace() {
     status: getTaskStatusString(task.status),
     difficulty: "Medium",
     worker: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+      ? task.worker 
+      : undefined,
+    workerDisplay: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
       ? `${task.worker.slice(0, 6)}...${task.worker.slice(-4)}` 
       : undefined,
   }))
