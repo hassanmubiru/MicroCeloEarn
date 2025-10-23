@@ -76,6 +76,20 @@ async function getContract(withSigner = true) {
 
   const provider = new ethers.BrowserProvider(window.ethereum)
 
+  // Check network first
+  try {
+    const network = await provider.getNetwork()
+    console.log("Current network:", network.chainId.toString())
+    
+    // Check if we're on the correct network (Celo Sepolia = 11142220)
+    if (network.chainId !== 11142220n) {
+      throw new Error(`Wrong network! Please switch to Celo Sepolia (Chain ID: 11142220). Current: ${network.chainId}`)
+    }
+  } catch (error) {
+    console.error("Network check failed:", error)
+    throw new Error("Network connection error. Please check your wallet connection.")
+  }
+
   const signer = withSigner ? await provider.getSigner() : null
   const userAddress = signer ? await signer.getAddress() : undefined
 
