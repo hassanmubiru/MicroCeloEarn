@@ -42,6 +42,25 @@ export default function Home() {
             </div>
           </div>
           
+          {/* Gas Fee Education Section */}
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-6">
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-amber-100 p-2">
+                <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-amber-900 mb-2">Understanding Gas Fees</h3>
+                <div className="space-y-2 text-sm text-amber-800">
+                  <p><strong>For Workers:</strong> Accepting and submitting tasks requires small gas fees (~$0.01-0.05 CELO). These are blockchain transaction costs, not platform fees.</p>
+                  <p><strong>For Task Posters:</strong> You pay the full task reward + 2.5% platform fee upfront. Workers only pay gas fees.</p>
+                  <p><strong>Rewards:</strong> Workers receive the full task reward after completion - no deductions from your earnings!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div className="border-t pt-8">
             <h2 className="text-2xl font-bold mb-4">Available Tasks</h2>
             <TaskMarketplace />

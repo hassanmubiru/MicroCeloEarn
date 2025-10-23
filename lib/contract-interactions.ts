@@ -211,6 +211,58 @@ export async function cancelTask(taskId: number) {
 }
 
 /**
+ * Estimate gas cost for accepting a task
+ */
+export async function estimateAcceptTaskGas(taskId: number): Promise<{ gasLimit: bigint, gasPrice: bigint, costInCELO: string }> {
+  try {
+    const contract = await getContract()
+    const gasLimit = await contract.acceptTask.estimateGas(taskId)
+    const provider = new ethers.BrowserProvider(window.ethereum!)
+    const feeData = await provider.getFeeData()
+    const gasPrice = feeData.gasPrice || BigInt(20000000000) // 20 gwei fallback
+    
+    const costInWei = gasLimit * gasPrice
+    const costInCELO = ethers.formatEther(costInWei)
+    
+    return { gasLimit, gasPrice, costInCELO }
+  } catch (error) {
+    console.error("Gas estimation error:", error)
+    // Return conservative estimates
+    return { 
+      gasLimit: BigInt(100000), 
+      gasPrice: BigInt(20000000000), 
+      costInCELO: "0.002" 
+    }
+  }
+}
+
+/**
+ * Estimate gas cost for submitting a task
+ */
+export async function estimateSubmitTaskGas(taskId: number): Promise<{ gasLimit: bigint, gasPrice: bigint, costInCELO: string }> {
+  try {
+    const contract = await getContract()
+    const gasLimit = await contract.submitTask.estimateGas(taskId)
+    const provider = new ethers.BrowserProvider(window.ethereum!)
+    const feeData = await provider.getFeeData()
+    const gasPrice = feeData.gasPrice || BigInt(20000000000) // 20 gwei fallback
+    
+    const costInWei = gasLimit * gasPrice
+    const costInCELO = ethers.formatEther(costInWei)
+    
+    return { gasLimit, gasPrice, costInCELO }
+  } catch (error) {
+    console.error("Gas estimation error:", error)
+    // Return conservative estimates
+    return { 
+      gasLimit: BigInt(80000), 
+      gasPrice: BigInt(20000000000), 
+      costInCELO: "0.0016" 
+    }
+  }
+}
+
+/**
  * Get all open tasks
  */
 export async function getOpenTasks(): Promise<number[]> {

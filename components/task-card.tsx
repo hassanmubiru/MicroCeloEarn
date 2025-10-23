@@ -1,13 +1,14 @@
 "use client"
 
-import { Clock, DollarSign, Tag, TrendingUp, Loader2, CheckCircle, Star, User } from "lucide-react"
+import { Clock, DollarSign, Tag, TrendingUp, Loader2, CheckCircle, Star, User, AlertTriangle, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useWallet } from "@/lib/wallet-context"
-import { acceptTask, submitTask, approveTask, type Task } from "@/lib/contract-interactions"
+import { acceptTask, submitTask, approveTask, estimateAcceptTaskGas, estimateSubmitTaskGas, type Task } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 
 // Extended Task interface for display
@@ -31,6 +32,30 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isApproving, setIsApproving] = useState(false)
   const [rating, setRating] = useState(5)
+  const [acceptGasCost, setAcceptGasCost] = useState<string>("~$0.01-0.05")
+  const [submitGasCost, setSubmitGasCost] = useState<string>("~$0.01-0.05")
+
+  // Estimate gas costs when component mounts
+  useEffect(() => {
+    const estimateGasCosts = async () => {
+      if (!isConnected || !isContractConfigured()) return
+      
+      try {
+        // Estimate accept task gas
+        const acceptEstimate = await estimateAcceptTaskGas(task.id)
+        setAcceptGasCost(`~${parseFloat(acceptEstimate.costInCELO).toFixed(4)} CELO`)
+        
+        // Estimate submit task gas
+        const submitEstimate = await estimateSubmitTaskGas(task.id)
+        setSubmitGasCost(`~${parseFloat(submitEstimate.costInCELO).toFixed(4)} CELO`)
+      } catch (error) {
+        console.log("Gas estimation failed, using defaults:", error)
+        // Keep default values
+      }
+    }
+
+    estimateGasCosts()
+  }, [isConnected, task.id])
 
   const timeUntilDeadline = () => {
     const now = new Date()
@@ -188,20 +213,28 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
     const isTaskPoster = address?.toLowerCase() === task.poster.toLowerCase()
     const isTaskWorker = address?.toLowerCase() === task.worker?.toLowerCase()
 
-
     // Task is open - anyone can accept
     if (task.status === "open") {
       return (
-        <Button className="w-full" size="lg" onClick={handleAcceptTask} disabled={!isConnected || isAccepting || isTaskPoster}>
-        {isAccepting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Accepting...
-          </>
-        ) : (
-          "Accept Task"
-        )}
-        </Button>
+        <div className="w-full space-y-3">
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <strong>Gas Fee Notice:</strong> Accepting this task requires a small gas fee ({acceptGasCost}). 
+              You'll earn the full reward after completing the task.
+            </AlertDescription>
+          </Alert>
+          <Button className="w-full" size="lg" onClick={handleAcceptTask} disabled={!isConnected || isAccepting || isTaskPoster}>
+            {isAccepting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Accepting...
+              </>
+            ) : (
+              "Accept Task"
+            )}
+          </Button>
+        </div>
       )
     }
 
@@ -219,6 +252,13 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
                 Complete the task and submit your work for review.
               </p>
             </div>
+            <Alert className="border-blue-200 bg-blue-50">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-800">
+                <strong>Submit Fee:</strong> Submitting your work requires a small gas fee ({submitGasCost}). 
+                You'll receive the full reward after approval.
+              </AlertDescription>
+            </Alert>
             <Button className="w-full" size="lg" onClick={handleSubmitTask} disabled={!isConnected || isSubmitting}>
               {isSubmitting ? (
                 <>
