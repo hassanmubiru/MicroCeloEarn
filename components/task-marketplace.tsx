@@ -16,11 +16,16 @@ export function TaskMarketplace() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   useEffect(() => {
     // Mark as client-side rendered
     setIsClient(true)
   }, [])
+
+  const refreshTasks = () => {
+    setRefreshTrigger(prev => prev + 1)
+  }
 
   useEffect(() => {
     if (!isClient) return
@@ -67,7 +72,7 @@ export function TaskMarketplace() {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isClient])
+  }, [isClient, refreshTrigger])
 
   const filteredTasks = tasks.filter((task) => {
     const categoryMatch = selectedCategory === "all" || task.category === selectedCategory
