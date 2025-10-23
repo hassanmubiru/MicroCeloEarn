@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Eye, Loader2 } from "lucide-react"
+import { Eye, Loader2, CheckCircle, Star } from "lucide-react"
 import { getAllTasks, TaskStatus, type Task } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
 
@@ -104,9 +104,25 @@ export function TasksTable() {
                 <TableCell>{getStatusBadge(task.status)}</TableCell>
                 <TableCell>{new Date(task.createdAt * 1000).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="sm">
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {task.status === TaskStatus.InReview && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-green-600 border-green-200 hover:bg-green-50"
+                        onClick={() => {
+                          // Navigate to review tab or show review modal
+                          window.location.hash = '#review'
+                        }}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Review
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
