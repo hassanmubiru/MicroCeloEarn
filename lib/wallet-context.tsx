@@ -156,18 +156,29 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const celoBalance = await provider.getBalance(address)
       const celoFormatted = ethers.formatEther(celoBalance)
 
-      // Fetch cUSD balance
-      const cUSDContract = new ethers.Contract(
-        DEFAULT_NETWORK.tokens.cUSD,
-        ["function balanceOf(address) view returns (uint256)"],
-        provider,
-      )
-      const cUSDBalance = await cUSDContract.balanceOf(address)
-      const cUSDFormatted = ethers.formatEther(cUSDBalance)
+      // Fetch cUSD balance (if available)
+      let cUSDFormatted = "0.00"
+      if (DEFAULT_NETWORK.tokens.cUSD !== "0x0000000000000000000000000000000000000000") {
+        try {
+          const cUSDContract = new ethers.Contract(
+            DEFAULT_NETWORK.tokens.cUSD,
+            ["function balanceOf(address) view returns (uint256)"],
+            provider,
+          )
+          const cUSDBalance = await cUSDContract.balanceOf(address)
+          cUSDFormatted = ethers.formatEther(cUSDBalance)
+        } catch (err) {
+          console.log("[v0] cUSD not available on this network:", err.message)
+          cUSDFormatted = "N/A"
+        }
+      } else {
+        console.log("[v0] cUSD not available on Celo Sepolia")
+        cUSDFormatted = "N/A"
+      }
 
       setBalance({
         CELO: Number.parseFloat(celoFormatted).toFixed(2),
-        cUSD: Number.parseFloat(cUSDFormatted).toFixed(2),
+        cUSD: cUSDFormatted === "N/A" ? "N/A" : Number.parseFloat(cUSDFormatted).toFixed(2),
       })
 
       console.log("[v0] Balances fetched - CELO:", celoFormatted, "cUSD:", cUSDFormatted)

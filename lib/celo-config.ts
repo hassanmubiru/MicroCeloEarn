@@ -41,8 +41,8 @@ export const CELO_NETWORKS = {
       decimals: 18,
     },
     tokens: {
-      cUSD: "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1",
-      CELO: "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9",
+      cUSD: "0x0000000000000000000000000000000000000000", // Not available on Sepolia
+      CELO: "0x471EcE3750Da237f93B8E339c536989b8978a438", // Native CELO
     },
   },
 }
