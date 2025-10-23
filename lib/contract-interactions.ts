@@ -7,7 +7,7 @@ import {
   validateContractAddress,
 } from "./celo-config"
 
-// ABI for MicroCeloEarn contract (exact match with deployed contract)
+// ABI for MicroCeloEarn contract (exact match with deployed contract) - Updated 2024
 const CONTRACT_ABI = [
   "function createTask(string title, string description, string category, uint256 reward, uint8 paymentToken, uint256 deadline) external payable returns (uint256)",
   "function acceptTask(uint256 taskId) external",
@@ -80,7 +80,7 @@ async function getContract(withSigner = true) {
 
   const provider = new ethers.BrowserProvider(window.ethereum)
 
-  // Check network first (only log once)
+  // Check network first (optimized - no console.log)
   try {
     const network = await provider.getNetwork()
     
