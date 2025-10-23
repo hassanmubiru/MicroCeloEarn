@@ -18,6 +18,13 @@ export function TaskMarketplace() {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Mark as client-side rendered
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
     async function fetchTasks() {
       if (!isContractConfigured()) {
         setLoading(false)
@@ -60,7 +67,7 @@ export function TaskMarketplace() {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [])
+  }, [isClient])
 
   const filteredTasks = tasks.filter((task) => {
     const categoryMatch = selectedCategory === "all" || task.category === selectedCategory
