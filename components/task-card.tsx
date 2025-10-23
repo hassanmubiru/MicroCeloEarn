@@ -1,14 +1,13 @@
 "use client"
 
-import { Clock, DollarSign, Tag, TrendingUp } from "lucide-react"
+import { Clock, DollarSign, Tag, TrendingUp, Loader2, CheckCircle, Star, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useWallet } from "@/lib/wallet-context"
-import { acceptTask } from "@/lib/contract-interactions"
+import { acceptTask, submitTask, approveTask } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface Task {
@@ -22,6 +21,7 @@ interface Task {
   poster: string
   status: string
   difficulty: string
+  worker?: string
 }
 
 interface TaskCardProps {
@@ -29,9 +29,12 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task }: TaskCardProps) {
-  const { isConnected } = useWallet()
+  const { isConnected, address } = useWallet()
   const { toast } = useToast()
   const [isAccepting, setIsAccepting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isApproving, setIsApproving] = useState(false)
+  const [rating, setRating] = useState(5)
 
   const timeUntilDeadline = () => {
     const now = new Date()
@@ -101,6 +104,66 @@ export function TaskCard({ task }: TaskCardProps) {
       })
     } finally {
       setIsAccepting(false)
+    }
+  }
+
+  const handleSubmitTask = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet not connected",
+        description: "Please connect your wallet to submit tasks.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      await submitTask(task.id)
+
+      toast({
+        title: "Task submitted!",
+        description: "Your task has been submitted for review.",
+      })
+    } catch (error: any) {
+      console.error("[v0] Error submitting task:", error)
+      toast({
+        title: "Failed to submit task",
+        description: error.message || "An error occurred while submitting the task.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleApproveTask = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Wallet not connected",
+        description: "Please connect your wallet to approve tasks.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsApproving(true)
+    try {
+      await approveTask(task.id, rating)
+
+      toast({
+        title: "Task approved!",
+        description: `Payment of ${task.reward} ${task.currency} has been released to the worker.`,
+      })
+    } catch (error: any) {
+      console.error("[v0] Error approving task:", error)
+      toast({
+        title: "Failed to approve task",
+        description: error.message || "An error occurred while approving the task.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsApproving(false)
     }
   }
 
