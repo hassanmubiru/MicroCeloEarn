@@ -149,7 +149,7 @@ export function TaskMarketplace() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {formattedTasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} onTaskUpdate={refreshTasks} />
         ))}
       </div>
 

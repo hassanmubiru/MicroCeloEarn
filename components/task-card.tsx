@@ -20,6 +20,7 @@ interface DisplayTask extends Task {
 
 interface TaskCardProps {
   task: DisplayTask
+  onTaskUpdate?: () => void
 }
 
 export function TaskCard({ task }: TaskCardProps) {
