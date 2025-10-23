@@ -12,20 +12,11 @@ interface AdminAccessGuardProps {
 }
 
 export function AdminAccessGuard({ children }: AdminAccessGuardProps) {
-  const { isConnected, connectWallet } = useWallet()
-  const { isAdmin, isChecking, error } = useAdminAccess()
-
-  // Show loading while checking admin access
-  if (isChecking) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground">Verifying admin access...</p>
-        </div>
-      </div>
-    )
-  }
+  const { isConnected, connectWallet, address } = useWallet()
+  
+  // Your specific admin address - direct check
+  const ADMIN_ADDRESS = "0x50625608E728cad827066dD78F5B4e8d203619F3"
+  const isAdmin = address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase()
 
   // Show wallet connection prompt if not connected
   if (!isConnected) {
@@ -62,17 +53,14 @@ export function AdminAccessGuard({ children }: AdminAccessGuardProps) {
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                {error || "Only the contract owner can access the admin dashboard."}
+                Only the designated admin can access the admin dashboard.
               </AlertDescription>
             </Alert>
             
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>To access the admin dashboard, you need to:</p>
-              <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>Be the contract owner (deployer)</li>
-                <li>Connect with the owner wallet</li>
-                <li>Ensure you're on the correct network</li>
-              </ul>
+              <p><strong>Your Address:</strong> {address}</p>
+              <p><strong>Expected Admin:</strong> {ADMIN_ADDRESS}</p>
+              <p><strong>Match:</strong> {isAdmin ? '✅ Yes' : '❌ No'}</p>
             </div>
 
             <div className="pt-4 border-t">

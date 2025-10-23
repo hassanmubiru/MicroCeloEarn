@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <AdminBypass>
+    <AdminAccessGuard>
       <div className="min-h-screen bg-background">
         <AdminHeader />
 
@@ -92,6 +92,6 @@ export default function AdminDashboard() {
           </Tabs>
         </main>
       </div>
-    </AdminBypass>
+    </AdminAccessGuard>
   )
 }
