@@ -7,18 +7,18 @@ import {
   validateContractAddress,
 } from "./celo-config"
 
-// ABI for MicroCeloEarn contract (simplified for key functions)
+// ABI for MicroCeloEarn contract (exact match with deployed contract)
 const CONTRACT_ABI = [
   "function createTask(string title, string description, string category, uint256 reward, uint8 paymentToken, uint256 deadline) external payable returns (uint256)",
   "function acceptTask(uint256 taskId) external",
   "function submitTask(uint256 taskId) external",
   "function approveTask(uint256 taskId, uint256 rating) external",
   "function cancelTask(uint256 taskId) external",
-  "function getOpenTasks() external view returns (uint256[])",
+  "function getOpenTasks() external view returns (uint256[] memory)",
   "function tasks(uint256) external view returns (uint256 id, address poster, address worker, string title, string description, string category, uint256 reward, uint8 paymentToken, uint8 status, uint256 createdAt, uint256 deadline, bool fundsEscrowed)",
   "function getWorkerProfile(address worker) external view returns (uint256 tasksCompleted, uint256 totalEarned, uint256 rating, uint256 ratingCount)",
-  "function getUserPostedTasks(address user) external view returns (uint256[])",
-  "function getUserAssignedTasks(address user) external view returns (uint256[])",
+  "function getUserPostedTasks(address user) external view returns (uint256[] memory)",
+  "function getUserAssignedTasks(address user) external view returns (uint256[] memory)",
   "function taskCounter() external view returns (uint256)",
   "event TaskCreated(uint256 indexed taskId, address indexed poster, uint256 reward, uint8 token)",
   "event TaskAssigned(uint256 indexed taskId, address indexed worker)",
@@ -200,9 +200,25 @@ export async function cancelTask(taskId: number) {
  * Get all open tasks
  */
 export async function getOpenTasks(): Promise<number[]> {
-  const contract = await getContract(false)
-  const taskIds = await contract.getOpenTasks()
-  return taskIds.map((id: bigint) => Number(id))
+  try {
+    const contract = await getContract(false)
+    const taskIds = await contract.getOpenTasks()
+    return taskIds.map((id: bigint) => Number(id))
+  } catch (error) {
+    console.error("getOpenTasks error:", error)
+    
+    // Handle specific ABI decoding errors
+    if (error.message.includes("could not decode result data")) {
+      throw new Error("Contract ABI mismatch. Please check the contract interface.")
+    }
+    
+    // Handle network errors
+    if (error.message.includes("network")) {
+      throw new Error("Network connection error. Please check your wallet connection.")
+    }
+    
+    throw error
+  }
 }
 
 /**
