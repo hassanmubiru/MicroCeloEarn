@@ -42,9 +42,10 @@ export default function AdminDashboard() {
           <AdminStats />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
-            <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+            <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
+              <TabsTrigger value="create">Create Task</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="disputes">Disputes</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -56,6 +57,10 @@ export default function AdminDashboard() {
 
             <TabsContent value="tasks" className="mt-6">
               <TasksTable />
+            </TabsContent>
+
+            <TabsContent value="create" className="mt-6">
+              <AdminCreateTask />
             </TabsContent>
 
             <TabsContent value="users" className="mt-6">
