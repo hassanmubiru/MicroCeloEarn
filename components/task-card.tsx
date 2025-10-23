@@ -23,7 +23,7 @@ interface TaskCardProps {
   onTaskUpdate?: () => void
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
   const { isConnected, address } = useWallet()
   const { toast } = useToast()
   const [isAccepting, setIsAccepting] = useState(false)
@@ -75,6 +75,13 @@ export function TaskCard({ task }: TaskCardProps) {
         title: "Task accepted!",
         description: "You can now start working on this task.",
       })
+      
+      // Refresh the task list after a short delay to ensure blockchain state is updated
+      if (onTaskUpdate) {
+        setTimeout(() => {
+          onTaskUpdate()
+        }, 2000)
+      }
     } catch (error: any) {
       console.error("[v0] Error accepting task:", error)
 
@@ -120,6 +127,13 @@ export function TaskCard({ task }: TaskCardProps) {
         title: "Task submitted!",
         description: "Your task has been submitted for review.",
       })
+      
+      // Refresh the task list after a short delay to ensure blockchain state is updated
+      if (onTaskUpdate) {
+        setTimeout(() => {
+          onTaskUpdate()
+        }, 2000)
+      }
     } catch (error: any) {
       console.error("[v0] Error submitting task:", error)
       toast({
@@ -150,6 +164,13 @@ export function TaskCard({ task }: TaskCardProps) {
         title: "Task approved!",
         description: `Payment of ${task.reward} ${task.currency} has been released to the worker.`,
       })
+      
+      // Refresh the task list after a short delay to ensure blockchain state is updated
+      if (onTaskUpdate) {
+        setTimeout(() => {
+          onTaskUpdate()
+        }, 2000)
+      }
     } catch (error: any) {
       console.error("[v0] Error approving task:", error)
       toast({
