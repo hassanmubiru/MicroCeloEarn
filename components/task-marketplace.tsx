@@ -178,13 +178,110 @@ export function TaskMarketplace() {
         onDifficultyChange={setSelectedDifficulty}
       />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {formattedTasks.map((task) => (
-          <TaskCard key={task.id} task={task} onTaskUpdate={refreshTasks} />
-        ))}
+      {/* My Assigned Tasks */}
+      {assignedTasks.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-semibold">My Assigned Tasks</h2>
+            <span className="rounded-full bg-blue-100 px-2 py-1 text-sm font-medium text-blue-800">
+              {assignedTasks.length}
+            </span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {assignedTasks.map((task) => {
+              const formattedTask = {
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                category: task.category,
+                reward: task.reward,
+                currency: task.paymentToken === 0 ? "cUSD" : "CELO",
+                deadline: new Date(task.deadline * 1000).toISOString(),
+                poster: `${task.poster.slice(0, 6)}...${task.poster.slice(-4)}`,
+                status: getTaskStatusString(task.status),
+                difficulty: "Medium",
+                worker: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+                  ? task.worker 
+                  : undefined,
+                workerDisplay: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+                  ? `${task.worker.slice(0, 6)}...${task.worker.slice(-4)}` 
+                  : undefined,
+              }
+              return <TaskCard key={task.id} task={formattedTask} onTaskUpdate={refreshTasks} />
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Available Tasks */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold">Available Tasks</h2>
+          <span className="rounded-full bg-green-100 px-2 py-1 text-sm font-medium text-green-800">
+            {openTasks.length}
+          </span>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {openTasks.map((task) => {
+            const formattedTask = {
+              id: task.id,
+              title: task.title,
+              description: task.description,
+              category: task.category,
+              reward: task.reward,
+              currency: task.paymentToken === 0 ? "cUSD" : "CELO",
+              deadline: new Date(task.deadline * 1000).toISOString(),
+              poster: `${task.poster.slice(0, 6)}...${task.poster.slice(-4)}`,
+              status: getTaskStatusString(task.status),
+              difficulty: "Medium",
+              worker: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+                ? task.worker 
+                : undefined,
+              workerDisplay: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+                ? `${task.worker.slice(0, 6)}...${task.worker.slice(-4)}` 
+                : undefined,
+            }
+            return <TaskCard key={task.id} task={formattedTask} onTaskUpdate={refreshTasks} />
+          })}
+        </div>
       </div>
 
-      {formattedTasks.length === 0 && !loading && (
+      {/* Other Tasks (In Review, Completed, etc.) */}
+      {otherTasks.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-semibold">Other Tasks</h2>
+            <span className="rounded-full bg-gray-100 px-2 py-1 text-sm font-medium text-gray-800">
+              {otherTasks.length}
+            </span>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {otherTasks.map((task) => {
+              const formattedTask = {
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                category: task.category,
+                reward: task.reward,
+                currency: task.paymentToken === 0 ? "cUSD" : "CELO",
+                deadline: new Date(task.deadline * 1000).toISOString(),
+                poster: `${task.poster.slice(0, 6)}...${task.poster.slice(-4)}`,
+                status: getTaskStatusString(task.status),
+                difficulty: "Medium",
+                worker: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+                  ? task.worker 
+                  : undefined,
+                workerDisplay: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+                  ? `${task.worker.slice(0, 6)}...${task.worker.slice(-4)}` 
+                  : undefined,
+              }
+              return <TaskCard key={task.id} task={formattedTask} onTaskUpdate={refreshTasks} />
+            })}
+          </div>
+        </div>
+      )}
+
+      {openTasks.length === 0 && assignedTasks.length === 0 && otherTasks.length === 0 && !loading && (
         <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed border-border p-8 text-center">
           <p className="text-lg font-medium text-muted-foreground">No tasks found</p>
           <p className="mt-2 text-sm text-muted-foreground">Try adjusting your filters or check back later</p>
