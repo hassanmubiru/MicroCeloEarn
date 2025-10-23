@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { TaskCard } from "@/components/task-card"
 import { TaskFilters } from "@/components/task-filters"
 import { CreateTaskDialog } from "@/components/create-task-dialog"
-import { getOpenTasks, getTask, type Task } from "@/lib/contract-interactions"
+import { getOpenTasks, getTask, getUserAssignedTasks, type Task } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
+import { useWallet } from "@/lib/wallet-context"
 import { Loader2, AlertCircle, Rocket } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function TaskMarketplace() {
+  const { address, isConnected } = useWallet()
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all")
   const [tasks, setTasks] = useState<Task[]>([])
@@ -40,9 +42,30 @@ export function TaskMarketplace() {
       try {
         setLoading(true)
         setError(null)
-        const taskIds = await getOpenTasks()
-        const taskDetails = await Promise.all(taskIds.map((id) => getTask(id)))
-        setTasks(taskDetails)
+        
+        // Get open tasks (available for everyone)
+        const openTaskIds = await getOpenTasks()
+        const openTasks = await Promise.all(openTaskIds.map((id) => getTask(id)))
+        
+        // Get user's assigned tasks (if connected)
+        let assignedTasks: Task[] = []
+        if (isConnected && address) {
+          try {
+            const assignedTaskIds = await getUserAssignedTasks(address)
+            assignedTasks = await Promise.all(assignedTaskIds.map((id) => getTask(id)))
+          } catch (err) {
+            console.log("[v0] Could not fetch assigned tasks:", err)
+            // Continue without assigned tasks if there's an error
+          }
+        }
+        
+        // Combine and deduplicate tasks
+        const allTasks = [...openTasks, ...assignedTasks]
+        const uniqueTasks = allTasks.filter((task, index, self) => 
+          index === self.findIndex(t => t.id === task.id)
+        )
+        
+        setTasks(uniqueTasks)
       } catch (err) {
         console.error("[v0] Error fetching tasks:", err)
         const errorMessage = err instanceof Error ? err.message : String(err)
@@ -72,7 +95,7 @@ export function TaskMarketplace() {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isClient, refreshTrigger])
+  }, [isClient, refreshTrigger, address, isConnected])
 
   const filteredTasks = tasks.filter((task) => {
     const categoryMatch = selectedCategory === "all" || task.category === selectedCategory
