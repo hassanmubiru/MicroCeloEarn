@@ -12,6 +12,9 @@ export function AdminStats() {
     activeTasks: 0,
     totalVolume: "0",
     openDisputes: 0,
+    tasksToday: 0,
+    totalTasks: 0,
+    completedTasks: 0,
   })
   const [loading, setLoading] = useState(true)
 
@@ -25,10 +28,13 @@ export function AdminStats() {
       try {
         const platformStats = await getPlatformStats()
         setStats({
-          totalUsers: 0, // Will be calculated from users table
+          totalUsers: platformStats.totalUsers,
           activeTasks: platformStats.activeTasks,
           totalVolume: platformStats.totalVolume,
           openDisputes: platformStats.disputedTasks,
+          tasksToday: platformStats.tasksToday,
+          totalTasks: platformStats.totalTasks,
+          completedTasks: platformStats.completedTasks,
         })
       } catch (error) {
         console.error("[v0] Error fetching platform stats:", error)

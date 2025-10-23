@@ -339,16 +339,38 @@ export async function getPlatformStats() {
   const completedTasks = allTasks.filter((t) => t.status === TaskStatus.Completed).length
   const disputedTasks = allTasks.filter((t) => t.status === TaskStatus.Disputed).length
 
-  // Calculate total volume
-  const totalVolume = allTasks.reduce((sum, task) => {
-    return sum + Number.parseFloat(task.reward)
-  }, 0)
+  // Calculate total volume from completed tasks only
+  const totalVolume = allTasks
+    .filter((t) => t.status === TaskStatus.Completed)
+    .reduce((sum, task) => {
+      return sum + Number.parseFloat(task.reward)
+    }, 0)
+
+  // Get unique users (posters and workers)
+  const uniqueUsers = new Set<string>()
+  allTasks.forEach((task) => {
+    uniqueUsers.add(task.poster)
+    if (task.worker && task.worker !== ethers.ZeroAddress) {
+      uniqueUsers.add(task.worker)
+    }
+  })
+
+  // Get tasks created today
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const todayTimestamp = Math.floor(today.getTime() / 1000)
+  
+  const tasksToday = allTasks.filter((task) => {
+    return Number(task.createdAt) >= todayTimestamp
+  }).length
 
   return {
     totalTasks,
     activeTasks,
     completedTasks,
     disputedTasks,
+    totalUsers: uniqueUsers.size,
+    tasksToday,
     totalVolume: totalVolume.toFixed(2),
   }
 }
