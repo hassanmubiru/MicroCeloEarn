@@ -167,6 +167,124 @@ export function TaskCard({ task }: TaskCardProps) {
     }
   }
 
+  const renderTaskActions = () => {
+    const isTaskPoster = address?.toLowerCase() === task.poster.toLowerCase()
+    const isTaskWorker = address?.toLowerCase() === task.worker?.toLowerCase()
+
+    // Task is open - anyone can accept
+    if (task.status === "open") {
+      return (
+        <Button className="w-full" size="lg" onClick={handleAcceptTask} disabled={!isConnected || isAccepting || isTaskPoster}>
+        {isAccepting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Accepting...
+          </>
+        ) : (
+          "Accept Task"
+        )}
+        </Button>
+      )
+    }
+
+    // Task is assigned - worker can submit
+    if (task.status === "assigned") {
+      if (isTaskWorker) {
+        return (
+          <Button className="w-full" size="lg" onClick={handleSubmitTask} disabled={!isConnected || isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Submit for Review
+              </>
+            )}
+          </Button>
+        )
+      } else {
+        return (
+          <div className="w-full text-center">
+            <Badge variant="secondary" className="gap-1">
+              <User className="h-3 w-3" />
+              Assigned to Worker
+            </Badge>
+          </div>
+        )
+      }
+    }
+
+    // Task is in review - poster can approve
+    if (task.status === "inreview") {
+      if (isTaskPoster) {
+        return (
+          <div className="w-full space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Rate the work:</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    onClick={() => setRating(star)}
+                    className={`p-1 ${rating >= star ? 'text-yellow-500' : 'text-gray-300'}`}
+                  >
+                    <Star className="h-4 w-4 fill-current" />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Button className="w-full" size="lg" onClick={handleApproveTask} disabled={!isConnected || isApproving}>
+              {isApproving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Approving...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Approve & Pay
+                </>
+              )}
+            </Button>
+          </div>
+        )
+      } else {
+        return (
+          <div className="w-full text-center">
+            <Badge variant="outline" className="gap-1">
+              <Clock className="h-3 w-3" />
+              Awaiting Review
+            </Badge>
+          </div>
+        )
+      }
+    }
+
+    // Task is completed
+    if (task.status === "completed") {
+      return (
+        <div className="w-full text-center">
+          <Badge variant="default" className="gap-1">
+            <CheckCircle className="h-3 w-3" />
+            Completed
+          </Badge>
+        </div>
+      )
+    }
+
+    // Default fallback
+    return (
+      <div className="w-full text-center">
+        <Badge variant="outline">
+          {task.status}
+        </Badge>
+      </div>
+    )
+  }
+
   return (
     <Card className="flex flex-col transition-all hover:shadow-lg">
       <CardHeader className="space-y-3">
@@ -208,16 +326,7 @@ export function TaskCard({ task }: TaskCardProps) {
       </CardContent>
 
       <CardFooter>
-        <Button className="w-full" size="lg" onClick={handleAcceptTask} disabled={!isConnected || isAccepting}>
-          {isAccepting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Accepting...
-            </>
-          ) : (
-            "Accept Task"
-          )}
-        </Button>
+        {renderTaskActions()}
       </CardFooter>
     </Card>
   )

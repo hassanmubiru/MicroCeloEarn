@@ -83,9 +83,25 @@ export function TaskMarketplace() {
     currency: task.paymentToken === 0 ? "cUSD" : "CELO",
     deadline: new Date(task.deadline * 1000).toISOString(),
     poster: `${task.poster.slice(0, 6)}...${task.poster.slice(-4)}`,
-    status: "open",
+    status: getTaskStatusString(task.status),
     difficulty: "Medium",
+    worker: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+      ? `${task.worker.slice(0, 6)}...${task.worker.slice(-4)}` 
+      : undefined,
   }))
+
+  // Helper function to convert task status enum to string
+  function getTaskStatusString(status: number): string {
+    switch (status) {
+      case 0: return "open"
+      case 1: return "assigned"
+      case 2: return "inreview"
+      case 3: return "completed"
+      case 4: return "cancelled"
+      case 5: return "disputed"
+      default: return "unknown"
+    }
+  }
 
   if (!isClient || loading) {
     return (
