@@ -188,16 +188,6 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
     const isTaskPoster = address?.toLowerCase() === task.poster.toLowerCase()
     const isTaskWorker = address?.toLowerCase() === task.worker?.toLowerCase()
 
-    // Debug logging
-    console.log("[v0] TaskCard Debug:", {
-      taskId: task.id,
-      status: task.status,
-      poster: task.poster,
-      worker: task.worker,
-      currentUser: address,
-      isTaskPoster,
-      isTaskWorker
-    })
 
     // Task is open - anyone can accept
     if (task.status === "open") {
@@ -219,19 +209,30 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
     if (task.status === "assigned") {
       if (isTaskWorker) {
         return (
-          <Button className="w-full" size="lg" onClick={handleSubmitTask} disabled={!isConnected || isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Submit for Review
-              </>
-            )}
-          </Button>
+          <div className="w-full space-y-3">
+            <div className="rounded-lg bg-green-50 p-3 text-center">
+              <div className="flex items-center justify-center gap-2 text-green-700">
+                <CheckCircle className="h-4 w-4" />
+                <span className="font-medium">You're working on this task!</span>
+              </div>
+              <p className="mt-1 text-sm text-green-600">
+                Complete the task and submit your work for review.
+              </p>
+            </div>
+            <Button className="w-full" size="lg" onClick={handleSubmitTask} disabled={!isConnected || isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Submit for Review
+                </>
+              )}
+            </Button>
+          </div>
         )
       } else {
         return (
@@ -277,6 +278,26 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
                 </>
               )}
             </Button>
+          </div>
+        )
+      } else if (isTaskWorker) {
+        return (
+          <div className="w-full space-y-2">
+            <div className="rounded-lg bg-blue-50 p-3 text-center">
+              <div className="flex items-center justify-center gap-2 text-blue-700">
+                <Clock className="h-4 w-4" />
+                <span className="font-medium">Work Submitted!</span>
+              </div>
+              <p className="mt-1 text-sm text-blue-600">
+                Waiting for the task poster to review your work.
+              </p>
+            </div>
+            <div className="text-center">
+              <Badge variant="outline" className="gap-1">
+                <Clock className="h-3 w-3" />
+                Awaiting Review
+              </Badge>
+            </div>
           </div>
         )
       } else {
