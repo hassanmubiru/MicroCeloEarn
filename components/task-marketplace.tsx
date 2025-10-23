@@ -6,7 +6,7 @@ import { TaskFilters } from "@/components/task-filters"
 import { getOpenTasks, getTask, getUserAssignedTasks, type Task } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
 import { useWallet } from "@/lib/wallet-context"
-import { Loader2, AlertCircle, Rocket } from "lucide-react"
+import { Loader2, AlertCircle, Rocket, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function TaskMarketplace() {
@@ -88,7 +88,7 @@ export function TaskMarketplace() {
 
     let interval: NodeJS.Timeout | null = null
     if (isContractConfigured()) {
-      interval = setInterval(fetchTasks, 30000)
+      interval = setInterval(fetchTasks, 120000) // Update every 2 minutes
     }
 
     return () => {
@@ -167,6 +167,16 @@ export function TaskMarketplace() {
           </h1>
           <p className="mt-2 text-pretty text-muted-foreground">Browse and complete micro-tasks to earn cUSD or CELO</p>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={refreshTasks}
+          disabled={loading}
+          className="gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       <TaskFilters

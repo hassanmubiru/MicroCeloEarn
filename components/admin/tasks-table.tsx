@@ -31,7 +31,7 @@ export function TasksTable() {
     }
 
     fetchTasks()
-    const interval = setInterval(fetchTasks, 30000)
+    const interval = setInterval(fetchTasks, 180000) // Update every 3 minutes
     return () => clearInterval(interval)
   }, [])
 

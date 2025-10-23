@@ -48,7 +48,7 @@ export function UsersTable() {
     }
 
     fetchUsers()
-    const interval = setInterval(fetchUsers, 30000)
+    const interval = setInterval(fetchUsers, 180000) // Update every 3 minutes
     return () => clearInterval(interval)
   }, [])
 

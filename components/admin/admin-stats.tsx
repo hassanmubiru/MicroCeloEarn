@@ -44,7 +44,7 @@ export function AdminStats() {
     }
 
     fetchStats()
-    const interval = setInterval(fetchStats, 30000)
+    const interval = setInterval(fetchStats, 180000) // Update every 3 minutes
     return () => clearInterval(interval)
   }, [])
 

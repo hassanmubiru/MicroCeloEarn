@@ -35,7 +35,7 @@ export function StatsBar() {
     }
 
     fetchStats()
-    const interval = setInterval(fetchStats, 30000) // Update every 30 seconds
+    const interval = setInterval(fetchStats, 180000) // Update every 3 minutes
     return () => clearInterval(interval)
   }, [])
 

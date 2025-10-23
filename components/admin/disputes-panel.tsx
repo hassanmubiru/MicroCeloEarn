@@ -30,7 +30,7 @@ export function DisputesPanel() {
     }
 
     fetchDisputes()
-    const interval = setInterval(fetchDisputes, 30000)
+    const interval = setInterval(fetchDisputes, 180000) // Update every 3 minutes
     return () => clearInterval(interval)
   }, [])
 
