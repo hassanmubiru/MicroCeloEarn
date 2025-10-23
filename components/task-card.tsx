@@ -5,23 +5,17 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useWallet } from "@/lib/wallet-context"
-import { acceptTask, submitTask, approveTask } from "@/lib/contract-interactions"
+import { acceptTask, submitTask, approveTask, type Task } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 
-interface Task {
-  id: number
-  title: string
-  description: string
-  category: string
-  reward: string
+// Extended Task interface for display
+interface DisplayTask extends Task {
   currency: string
-  deadline: string
-  poster: string
-  status: string
   difficulty: string
-  worker?: string
+  deadline: string
+  status: string
 }
 
 interface TaskCardProps {
