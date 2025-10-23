@@ -36,7 +36,9 @@ export function TaskMarketplace() {
         setLoading(true)
         setError(null)
         const taskIds = await getOpenTasks()
+        console.log("[v0] Open task IDs:", taskIds)
         const taskDetails = await Promise.all(taskIds.map((id) => getTask(id)))
+        console.log("[v0] Task details:", taskDetails)
         setTasks(taskDetails)
       } catch (err) {
         console.error("[v0] Error fetching tasks:", err)
@@ -74,21 +76,25 @@ export function TaskMarketplace() {
     return categoryMatch
   })
 
-  const formattedTasks = filteredTasks.map((task) => ({
-    id: task.id,
-    title: task.title,
-    description: task.description,
-    category: task.category,
-    reward: task.reward,
-    currency: task.paymentToken === 0 ? "cUSD" : "CELO",
-    deadline: new Date(task.deadline * 1000).toISOString(),
-    poster: `${task.poster.slice(0, 6)}...${task.poster.slice(-4)}`,
-    status: getTaskStatusString(task.status),
-    difficulty: "Medium",
-    worker: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
-      ? `${task.worker.slice(0, 6)}...${task.worker.slice(-4)}` 
-      : undefined,
-  }))
+  const formattedTasks = filteredTasks.map((task) => {
+    const formattedTask = {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      category: task.category,
+      reward: task.reward,
+      currency: task.paymentToken === 0 ? "cUSD" : "CELO",
+      deadline: new Date(task.deadline * 1000).toISOString(),
+      poster: `${task.poster.slice(0, 6)}...${task.poster.slice(-4)}`,
+      status: getTaskStatusString(task.status),
+      difficulty: "Medium",
+      worker: task.worker && task.worker !== "0x0000000000000000000000000000000000000000" 
+        ? `${task.worker.slice(0, 6)}...${task.worker.slice(-4)}` 
+        : undefined,
+    }
+    console.log("[v0] Formatted task:", formattedTask)
+    return formattedTask
+  })
 
   // Helper function to convert task status enum to string
   function getTaskStatusString(status: number): string {

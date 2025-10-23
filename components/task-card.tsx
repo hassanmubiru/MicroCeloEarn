@@ -19,7 +19,7 @@ interface DisplayTask extends Task {
 }
 
 interface TaskCardProps {
-  task: Task
+  task: DisplayTask
 }
 
 export function TaskCard({ task }: TaskCardProps) {
@@ -164,6 +164,10 @@ export function TaskCard({ task }: TaskCardProps) {
   const renderTaskActions = () => {
     const isTaskPoster = address?.toLowerCase() === task.poster.toLowerCase()
     const isTaskWorker = address?.toLowerCase() === task.worker?.toLowerCase()
+
+    // Debug logging
+    console.log("[v0] Task status:", task.status, "Type:", typeof task.status)
+    console.log("[v0] Task details:", { id: task.id, title: task.title, status: task.status })
 
     // Task is open - anyone can accept
     if (task.status === "open") {
