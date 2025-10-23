@@ -10,6 +10,7 @@ import { acceptTask, submitTask, approveTask, estimateAcceptTaskGas, estimateSub
 import { isContractConfigured } from "@/lib/celo-config"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
+import { TaskCompletionDialog } from "@/components/task-completion-dialog"
 
 // Extended Task interface for display
 interface DisplayTask extends Task {
@@ -34,6 +35,7 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
   const [rating, setRating] = useState(5)
   const [acceptGasCost, setAcceptGasCost] = useState<string>("~$0.01-0.05")
   const [submitGasCost, setSubmitGasCost] = useState<string>("~$0.01-0.05")
+  const [showCompletionDialog, setShowCompletionDialog] = useState(false)
 
   // Estimate gas costs when component mounts
   useEffect(() => {
@@ -66,6 +68,15 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
 
     if (days > 0) return `${days}d ${hours}h`
     return `${hours}h`
+  }
+
+  const handleCardClick = () => {
+    const isTaskWorker = address?.toLowerCase() === task.worker?.toLowerCase()
+    
+    // Only open completion dialog for assigned tasks where user is the worker
+    if (task.status === "assigned" && isTaskWorker) {
+      setShowCompletionDialog(true)
+    }
   }
 
   const difficultyColor = {
@@ -249,7 +260,7 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
                 <span className="font-medium">You're working on this task!</span>
               </div>
               <p className="mt-1 text-sm text-green-600">
-                Complete the task and submit your work for review.
+                Click on the task card to complete and submit your work.
               </p>
             </div>
             <Alert className="border-blue-200 bg-blue-50">
@@ -375,7 +386,15 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
   }
 
   return (
-    <Card className="flex flex-col transition-all hover:shadow-lg">
+    <>
+      <Card 
+        className={`flex flex-col transition-all hover:shadow-lg ${
+          task.status === "assigned" && address?.toLowerCase() === task.worker?.toLowerCase() 
+            ? "cursor-pointer hover:shadow-xl" 
+            : ""
+        }`}
+        onClick={handleCardClick}
+      >
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-2">
           <Badge variant="outline" className="gap-1">
@@ -425,5 +444,14 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
         {renderTaskActions()}
       </CardFooter>
     </Card>
+
+    {/* Task Completion Dialog */}
+    <TaskCompletionDialog
+      task={task}
+      open={showCompletionDialog}
+      onOpenChange={setShowCompletionDialog}
+      onTaskUpdate={onTaskUpdate}
+    />
+    </>
   )
 }
