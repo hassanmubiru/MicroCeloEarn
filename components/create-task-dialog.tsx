@@ -52,6 +52,12 @@ export function CreateTaskDialog() {
       return
     }
 
+    // Check if user is trying to use cUSD when it's not available
+    if (formData.paymentToken === "0" && !isCUSDAvailable) {
+      setError("cUSD is not available on this network. Please use CELO instead.")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -72,7 +78,7 @@ export function CreateTaskDialog() {
           description: "",
           category: "",
           reward: "",
-          paymentToken: "0",
+          paymentToken: isCUSDAvailable ? "0" : "1",
           deadlineHours: "24",
         })
         setSuccess(false)
