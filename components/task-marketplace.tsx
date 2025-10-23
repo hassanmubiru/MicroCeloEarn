@@ -102,6 +102,11 @@ export function TaskMarketplace() {
     return categoryMatch
   })
 
+  // Separate tasks into open and assigned
+  const openTasks = filteredTasks.filter(task => task.status === 0) // TaskStatus.Open
+  const assignedTasks = filteredTasks.filter(task => task.status === 1) // TaskStatus.Assigned
+  const otherTasks = filteredTasks.filter(task => task.status > 1) // InReview, Completed, etc.
+
   const formattedTasks = filteredTasks.map((task) => ({
     id: task.id,
     title: task.title,
