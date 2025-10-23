@@ -6,8 +6,6 @@ import { CreateTaskDialog } from "@/components/create-task-dialog"
 import { Header } from "@/components/header"
 import { StatsBar } from "@/components/stats-bar"
 import { OnboardingDialog } from "@/components/onboarding-dialog"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
 
 export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(false)
