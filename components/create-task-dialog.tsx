@@ -205,7 +205,9 @@ export function CreateTaskDialog() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">cUSD (Stablecoin)</SelectItem>
+                  <SelectItem value="0" disabled={!isCUSDAvailable}>
+                    cUSD (Stablecoin) {!isCUSDAvailable && "(Not available on this network)"}
+                  </SelectItem>
                   <SelectItem value="1">CELO</SelectItem>
                 </SelectContent>
               </Select>
