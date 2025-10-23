@@ -11,6 +11,7 @@ import { TransactionsChart } from "@/components/admin/transactions-chart"
 import { AdminSettings } from "@/components/admin/admin-settings"
 import { AdminCreateTask } from "@/components/admin/admin-create-task"
 import { TaskReviewPanel } from "@/components/admin/task-review-panel"
+import { AdminDebug } from "@/components/admin/admin-debug"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function AdminDashboard() {
@@ -43,7 +44,7 @@ export default function AdminDashboard() {
           <AdminStats />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
-            <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
+            <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-grid">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="tasks">Tasks</TabsTrigger>
               <TabsTrigger value="review">Review</TabsTrigger>
@@ -51,6 +52,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="disputes">Disputes</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="debug">Debug</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6 mt-6">
@@ -79,6 +81,10 @@ export default function AdminDashboard() {
 
             <TabsContent value="settings" className="mt-6">
               <AdminSettings />
+            </TabsContent>
+
+            <TabsContent value="debug" className="mt-6">
+              <AdminDebug />
             </TabsContent>
           </Tabs>
         </main>
