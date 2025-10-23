@@ -12,6 +12,7 @@ import { AdminSettings } from "@/components/admin/admin-settings"
 import { AdminCreateTask } from "@/components/admin/admin-create-task"
 import { TaskReviewPanel } from "@/components/admin/task-review-panel"
 import { AdminDebug } from "@/components/admin/admin-debug"
+import { AdminTest } from "@/components/admin/admin-test"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function AdminDashboard() {
@@ -83,7 +84,8 @@ export default function AdminDashboard() {
               <AdminSettings />
             </TabsContent>
 
-            <TabsContent value="debug" className="mt-6">
+            <TabsContent value="debug" className="mt-6 space-y-6">
+              <AdminTest />
               <AdminDebug />
             </TabsContent>
           </Tabs>

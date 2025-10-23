@@ -75,7 +75,24 @@ export function AdminDebug() {
     }
     setChecks({ ...newChecks })
 
-    // Check 4: Contract Access
+    // Check 4: Admin Address Check
+    newChecks.adminAddress = { status: 'loading', message: 'Checking admin address...' }
+    setChecks({ ...newChecks })
+    
+    const ADMIN_ADDRESS = "0x50625608E728cad827066dD78F5B4e8d203619F3"
+    const isAdminAddress = address?.toLowerCase() === ADMIN_ADDRESS.toLowerCase()
+    
+    if (isAdminAddress) {
+      newChecks.adminAddress = { status: 'success', message: 'You are the designated admin' }
+    } else {
+      newChecks.adminAddress = { 
+        status: 'error', 
+        message: `Not the admin address. Expected: ${ADMIN_ADDRESS.slice(0, 6)}...${ADMIN_ADDRESS.slice(-4)}` 
+      }
+    }
+    setChecks({ ...newChecks })
+
+    // Check 5: Contract Access
     newChecks.contractAccess = { status: 'loading', message: 'Checking contract access...' }
     setChecks({ ...newChecks })
     
