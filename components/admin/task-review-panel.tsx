@@ -47,8 +47,14 @@ export function TaskReviewPanel() {
 
       try {
         const allTasks = await getAllTasks()
+        console.log("[v0] All tasks fetched:", allTasks.length)
+        console.log("[v0] Task statuses:", allTasks.map(t => ({ id: t.id, status: t.status, title: t.title })))
+        
         // Filter for tasks that need review (InReview status)
         const reviewTasks = allTasks.filter(task => task.status === TaskStatus.InReview)
+        console.log("[v0] InReview tasks found:", reviewTasks.length)
+        console.log("[v0] InReview tasks:", reviewTasks.map(t => ({ id: t.id, status: t.status, title: t.title })))
+        
         setTasks(reviewTasks)
       } catch (error) {
         console.error("[v0] Error fetching tasks:", error)

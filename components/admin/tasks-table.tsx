@@ -22,6 +22,9 @@ export function TasksTable() {
 
       try {
         const allTasks = await getAllTasks()
+        console.log("[v0] TasksTable - All tasks fetched:", allTasks.length)
+        console.log("[v0] TasksTable - Task statuses:", allTasks.map(t => ({ id: t.id, status: t.status, title: t.title })))
+        console.log("[v0] TasksTable - InReview tasks:", allTasks.filter(t => t.status === TaskStatus.InReview).length)
         setTasks(allTasks)
       } catch (error) {
         console.error("[v0] Error fetching tasks:", error)
