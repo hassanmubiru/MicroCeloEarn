@@ -20,6 +20,10 @@ const CONTRACT_ABI = [
   "function getUserPostedTasks(address user) external view returns (uint256[] memory)",
   "function getUserAssignedTasks(address user) external view returns (uint256[] memory)",
   "function taskCounter() external view returns (uint256)",
+  "function platformFee() external view returns (uint256)",
+  "function owner() external view returns (address)",
+  "function updatePlatformFee(uint256 _newFee) external",
+  "function withdrawFees() external",
   "event TaskCreated(uint256 indexed taskId, address indexed poster, uint256 reward, uint8 token)",
   "event TaskAssigned(uint256 indexed taskId, address indexed worker)",
   "event TaskCompleted(uint256 indexed taskId, address indexed worker, uint256 reward)",
@@ -76,10 +80,9 @@ async function getContract(withSigner = true) {
 
   const provider = new ethers.BrowserProvider(window.ethereum)
 
-  // Check network first
+  // Check network first (only log once)
   try {
     const network = await provider.getNetwork()
-    console.log("Current network:", network.chainId.toString())
     
     // Check if we're on the correct network (Celo Sepolia = 11142220)
     if (network.chainId !== 11142220n) {
