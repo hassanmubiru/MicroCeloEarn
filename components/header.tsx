@@ -1,6 +1,6 @@
 "use client"
 
-import { Wallet, Menu, User, LogOut, ExternalLink, HelpCircle } from "lucide-react"
+import { Wallet, Menu, User, LogOut, ExternalLink, HelpCircle, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -96,6 +96,15 @@ export function Header() {
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     My Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a
+                      href="/admin"
+                      className="flex cursor-pointer items-center"
+                    >
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </a>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <a

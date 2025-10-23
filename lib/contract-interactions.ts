@@ -377,3 +377,41 @@ export async function getDisputedTasks(): Promise<Task[]> {
   const allTasks = await getAllTasks()
   return allTasks.filter((task) => task.status === TaskStatus.Disputed)
 }
+
+/**
+ * Admin function: Update platform fee (only owner)
+ */
+export async function updatePlatformFee(newFee: number) {
+  const contract = await getContract()
+  const tx = await contract.updatePlatformFee(newFee)
+  const receipt = await tx.wait()
+  console.log("[v0] Platform fee updated:", receipt.hash)
+  return receipt
+}
+
+/**
+ * Admin function: Withdraw platform fees (only owner)
+ */
+export async function withdrawPlatformFees(paymentToken: PaymentToken) {
+  const contract = await getContract()
+  const tx = await contract.withdrawPlatformFees(paymentToken)
+  const receipt = await tx.wait()
+  console.log("[v0] Platform fees withdrawn:", receipt.hash)
+  return receipt
+}
+
+/**
+ * Admin function: Get contract owner
+ */
+export async function getContractOwner(): Promise<string> {
+  const contract = await getContract(false) // Don't need signer for read-only
+  return await contract.owner()
+}
+
+/**
+ * Admin function: Get platform fee
+ */
+export async function getPlatformFee(): Promise<number> {
+  const contract = await getContract(false) // Don't need signer for read-only
+  return await contract.platformFee()
+}
