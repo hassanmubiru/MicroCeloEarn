@@ -266,7 +266,7 @@ export async function getTask(taskId: number): Promise<Task> {
     category: task.category,
     reward: ethers.formatEther(task.reward),
     paymentToken: task.paymentToken,
-    status: task.status,
+    status: Number(task.status),
     createdAt: Number(task.createdAt),
     deadline: Number(task.deadline),
     fundsEscrowed: task.fundsEscrowed,
