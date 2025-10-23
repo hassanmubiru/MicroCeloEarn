@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useWallet } from "@/lib/wallet-context"
-import { acceptTask, submitTask, approveTask, estimateAcceptTaskGas, estimateSubmitTaskGas, type Task } from "@/lib/contract-interactions"
+import { acceptTask, submitTask, approveTask, estimateAcceptTaskGas, estimateSubmitTaskGas, verifyPaymentReceived, type Task, PaymentToken } from "@/lib/contract-interactions"
 import { isContractConfigured } from "@/lib/celo-config"
 import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
@@ -197,10 +197,27 @@ export function TaskCard({ task, onTaskUpdate }: TaskCardProps) {
     try {
       await approveTask(task.id, rating)
 
-      toast({
-        title: "Task approved!",
-        description: `Payment of ${task.reward} ${task.currency} has been released to the worker.`,
-      })
+      // Verify payment was received
+      const paymentToken = task.currency === "cUSD" ? PaymentToken.cUSD : PaymentToken.CELO
+      const verification = await verifyPaymentReceived(
+        task.worker || "",
+        task.id,
+        task.reward,
+        paymentToken
+      )
+
+      if (verification.success) {
+        toast({
+          title: "Task approved and payment verified!",
+          description: `Payment of ${task.reward} ${task.currency} has been successfully sent to the worker.`,
+        })
+      } else {
+        toast({
+          title: "Task approved but payment verification failed",
+          description: `Task was approved but payment may not have been received. ${verification.message}`,
+          variant: "destructive",
+        })
+      }
       
       // Refresh the task list after a short delay to ensure blockchain state is updated
       if (onTaskUpdate) {

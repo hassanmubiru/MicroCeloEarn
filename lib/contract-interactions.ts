@@ -196,6 +196,23 @@ export async function approveTask(taskId: number, rating: number) {
   const tx = await contract.approveTask(taskId, rating)
   const receipt = await tx.wait()
   console.log("[v0] Task approved, payment released:", receipt.hash)
+  
+  // Check if payment was successful by looking for TaskCompleted event
+  const taskCompletedEvent = receipt.logs.find(log => {
+    try {
+      const parsed = contract.interface.parseLog(log)
+      return parsed?.name === 'TaskCompleted'
+    } catch {
+      return false
+    }
+  })
+  
+  if (taskCompletedEvent) {
+    console.log("[v0] ✅ Payment confirmed in transaction receipt")
+  } else {
+    console.log("[v0] ⚠️  TaskCompleted event not found in receipt")
+  }
+  
   return receipt
 }
 
@@ -208,6 +225,67 @@ export async function cancelTask(taskId: number) {
   const receipt = await tx.wait()
   console.log("[v0] Task cancelled:", receipt.hash)
   return receipt
+}
+
+/**
+ * Get wallet balance for a specific token
+ */
+export async function getWalletBalance(address: string, tokenAddress?: string): Promise<string> {
+  try {
+    if (!tokenAddress || tokenAddress === "0x0000000000000000000000000000000000000000") {
+      // Get native CELO balance
+      const balance = await ethers.provider.getBalance(address)
+      return ethers.formatEther(balance)
+    } else {
+      // Get ERC20 token balance
+      const tokenContract = new ethers.Contract(tokenAddress, ERC20_ABI, ethers.provider)
+      const balance = await tokenContract.balanceOf(address)
+      return ethers.formatEther(balance)
+    }
+  } catch (error) {
+    console.error("Error getting wallet balance:", error)
+    return "0"
+  }
+}
+
+/**
+ * Verify payment was received by checking balance before and after
+ */
+export async function verifyPaymentReceived(
+  workerAddress: string, 
+  taskId: number, 
+  expectedAmount: string,
+  paymentToken: PaymentToken
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const tokenAddress = paymentToken === PaymentToken.cUSD 
+      ? DEFAULT_NETWORK.tokens.cUSD 
+      : DEFAULT_NETWORK.tokens.CELO
+    
+    const balance = await getWalletBalance(workerAddress, tokenAddress)
+    const balanceNumber = parseFloat(balance)
+    const expectedNumber = parseFloat(expectedAmount)
+    
+    console.log(`[v0] Worker balance: ${balance} ${paymentToken === PaymentToken.cUSD ? 'cUSD' : 'CELO'}`)
+    console.log(`[v0] Expected amount: ${expectedAmount} ${paymentToken === PaymentToken.cUSD ? 'cUSD' : 'CELO'}`)
+    
+    if (balanceNumber >= expectedNumber) {
+      return { 
+        success: true, 
+        message: `Payment verified! Balance: ${balance} ${paymentToken === PaymentToken.cUSD ? 'cUSD' : 'CELO'}` 
+      }
+    } else {
+      return { 
+        success: false, 
+        message: `Payment may not have been received. Current balance: ${balance} ${paymentToken === PaymentToken.cUSD ? 'cUSD' : 'CELO'}` 
+      }
+    }
+  } catch (error) {
+    return { 
+      success: false, 
+      message: `Error verifying payment: ${error.message}` 
+    }
+  }
 }
 
 /**

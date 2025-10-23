@@ -17,6 +17,7 @@ interface WalletContextType {
   connectWallet: () => Promise<void>
   disconnectWallet: () => void
   switchNetwork: () => Promise<void>
+  refreshBalances: () => Promise<void>
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined)
@@ -201,6 +202,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     setError(null)
   }
 
+  const refreshBalances = async () => {
+    if (address && isConnected) {
+      await fetchBalances()
+    }
+  }
+
   return (
     <WalletContext.Provider
       value={{
@@ -212,6 +219,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         connectWallet,
         disconnectWallet,
         switchNetwork,
+        refreshBalances,
       }}
     >
       {children}
