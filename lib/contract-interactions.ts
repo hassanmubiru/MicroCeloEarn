@@ -223,10 +223,25 @@ export async function getOpenTasks(): Promise<number[]> {
     
     // Handle specific ABI decoding errors
     if (error.message.includes("could not decode result data")) {
-      throw new Error("Contract ABI mismatch. Please check the contract interface.")
+      // Try with a direct RPC connection as fallback
+      try {
+        console.log("Attempting fallback RPC connection...")
+        const fallbackProvider = new ethers.JsonRpcProvider("https://rpc.ankr.com/celo_sepolia")
+        const fallbackContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, fallbackProvider)
+        const taskIds = await fallbackContract.getOpenTasks()
+        console.log("Fallback connection successful!")
+        return taskIds.map((id: bigint) => Number(id))
+      } catch (fallbackError) {
+        console.error("Fallback also failed:", fallbackError)
+        throw new Error("Contract connection failed. Please check your network connection and try again.")
+      }
     }
     
     // Handle network errors
+    if (error.message.includes("Wrong network")) {
+      throw new Error("Please switch to Celo Sepolia network in your wallet.")
+    }
+    
     if (error.message.includes("network")) {
       throw new Error("Network connection error. Please check your wallet connection.")
     }
