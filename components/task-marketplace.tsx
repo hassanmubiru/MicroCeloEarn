@@ -36,7 +36,9 @@ export function TaskMarketplace() {
         setLoading(true)
         setError(null)
         const taskIds = await getOpenTasks()
+        console.log("[v0] Fetched task IDs:", taskIds)
         const taskDetails = await Promise.all(taskIds.map((id) => getTask(id)))
+        console.log("[v0] Fetched task details:", taskDetails)
         setTasks(taskDetails)
       } catch (err) {
         console.error("[v0] Error fetching tasks:", err)
@@ -92,6 +94,7 @@ export function TaskMarketplace() {
 
   // Helper function to convert task status enum to string
   function getTaskStatusString(status: number): string {
+    console.log("[v0] Converting status:", status, "Type:", typeof status)
     switch (status) {
       case 0: return "open"
       case 1: return "assigned"
@@ -99,7 +102,9 @@ export function TaskMarketplace() {
       case 3: return "completed"
       case 4: return "cancelled"
       case 5: return "disputed"
-      default: return "unknown"
+      default: 
+        console.log("[v0] Unknown status:", status)
+        return "unknown"
     }
   }
 
