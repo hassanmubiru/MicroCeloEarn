@@ -36,9 +36,7 @@ export function TaskMarketplace() {
         setLoading(true)
         setError(null)
         const taskIds = await getOpenTasks()
-        console.log("[v0] Open task IDs:", taskIds)
         const taskDetails = await Promise.all(taskIds.map((id) => getTask(id)))
-        console.log("[v0] Task details:", taskDetails)
         setTasks(taskDetails)
       } catch (err) {
         console.error("[v0] Error fetching tasks:", err)
